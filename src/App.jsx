@@ -8,6 +8,7 @@ import thunderstorm from './assets/thunderstorm.jpg';
 import defau from './assets/default.jpg'; 
 import Snowy from './assets/Snowy.jpg';
 import fog from './assets/fog.jpg';
+import ErrorMessage from './components/ErrorMessages'
 //preloding images
 const preloadImages = [clear, clouds, rain, thunderstorm, defau, Snowy, fog].forEach(src => {
   const img = new Image();
@@ -20,7 +21,8 @@ const preloadImages = [clear, clouds, rain, thunderstorm, defau, Snowy, fog].for
 */
 function App() {
   const [data, setData] = useState({});
-  
+  const [errorMessage, setErrorMessage] = useState('');
+  const inputRef = useRef();
   /**
    * Fetches weather data from the OpenWeatherMap API for a given location.
    * If the location is not valid, an alert is shown and nothing else is done.
@@ -37,13 +39,14 @@ function App() {
     fetch(url)
       .then((response) => {
         if (!response.ok) {
-          alert("City not found");
+          setErrorMessage('Please enter a correct city name');
           throw new Error("Error fetching weather data");
         }
         return response.json();
       })
       .then((data) => {
         setData(data);
+        setErrorMessage("City not found");
         console.log(data);
       })
       .catch((error) => {
@@ -57,8 +60,14 @@ function App() {
   const reset = () => {
     setData(false); // Clear weather data
     inputRef.current.value = ''; // Clear input field
+    setErrorMessage('');
 }
-
+const refreshWeather = () => {
+    const location = inputRef.current.value;
+    if (location) {
+      fetchWeatherData(location); // Refresh weather without validation
+    }
+  };
   // Memoize the background image computation to avoid unnecessary recalculations
   const getBackgroundImage = useMemo(() => {
     if (!data.weather) return '';
@@ -84,7 +93,11 @@ function App() {
     <div className='app'style={{ backgroundImage: getBackgroundImage, backgroundRepeat: 'no-repeat', backgroundPosition: 'center', backgroundSize: 'cover'}}>
       <SearchBar onSearch={fetchWeatherData} />
       <WeatherCard data={data} />
-      <button className='fixed bottom-3 left-1/2 transform -translate-x-1/2 bg-white/60 text-gray-800 py-1 px-6 rounded-full shadow-lg hover:bg-gray-600/30 hover:text-white focus:outline-none' onClick={reset}>Reset</button>
+      <ErrorMessage message={errorMessage} onClose={() => setErrorMessage('')} />
+      <div className="button-group fixed bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-4">
+        <button className='bg-white/60 text-gray-800 py-1 px-6 rounded-full shadow-lg hover:bg-gray-600/30 hover:text-white focus:outline-none' onClick={reset}>Reset</button>
+        <button className='bg-white/60 text-gray-800 py-1 px-6 rounded-full shadow-lg hover:bg-gray-600/30 hover:text-white focus:outline-none' onClick={refreshWeather}>Refresh</button>
+      </div>
     </div>
   );
 }
