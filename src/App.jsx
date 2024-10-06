@@ -46,7 +46,6 @@ function App() {
       })
       .then((data) => {
         setData(data);
-        setErrorMessage("City not found");
         console.log(data);
       })
       .catch((error) => {
