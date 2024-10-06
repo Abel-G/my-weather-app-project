@@ -31,7 +31,7 @@ function App() {
    */
   const fetchWeatherData = (location) => {
     if(!location){
-      alert('Please enter correct city name');
+      setErrorMessage('Please enter a correct city name');
       return;
   }
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${import.meta.env.VITE_API_KEY}`;
