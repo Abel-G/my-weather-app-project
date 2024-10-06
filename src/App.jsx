@@ -39,7 +39,7 @@ function App() {
     fetch(url)
       .then((response) => {
         if (!response.ok) {
-          setErrorMessage('Please enter a correct city name');
+          setErrorMessage("City not found");
           throw new Error("Error fetching weather data");
         }
         return response.json();
